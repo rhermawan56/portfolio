@@ -5,7 +5,7 @@ import { resolve, extname, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 
 const cvFilename = 'Rizky_Hermawan_CV_2026_07_29.pdf';
-const originalCvHash = '8cf95e4b3afa3f9759b2c51539326b1768279157740a97c8fe76da5aa8130f3e';
+const originalCvHash = '4cbbc1923cef161fd7096ad3ab6d9be41abf6abe16b7796985bbb084c677de7c';
 async function expectOriginalCvDownload(page: import('@playwright/test').Page) {
   const pending = page.waitForEvent('download');
   await page.getByRole('link', { name: 'Unduh CV', exact: true }).click();
@@ -149,6 +149,7 @@ test('touch experience and portfolio do not overflow horizontally', async ({ pag
   await expect(page.locator('#portfolio')).toHaveAttribute('data-phase', 'reading');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await expect(page.locator('#profile-title')).toBeInViewport();
+  await page.getByRole('button', { name: 'Tampilkan proyek Manufacturing Planning System', exact: true }).click();
   await page.getByRole('button', { name: 'Lihat detail Manufacturing Planning System' }).click();
   await expect(page.locator('#project-dialog')).toBeVisible();
   expect(await page.locator('#project-dialog').evaluate(el => el.getBoundingClientRect().width < innerWidth)).toBe(true);
@@ -223,12 +224,92 @@ test.describe('GitHub Pages repository subfolder', () => {
 });
 
 for (const viewport of [{ width: 1440, height: 900, label: 'desktop' }, { width: 390, height: 844, label: 'mobile' }]) {
+  test(`project carousel navigation, gestures and dialog state on ${viewport.label}`, async ({ page, context }) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/#proyek');
+    const track = page.locator('#project-track');
+    const counter = page.locator('.carousel-counter');
+    const dialog = page.locator('#project-dialog');
+    await expect(page.getByRole('button', { name: 'Proyek sebelumnya', exact: true })).toBeDisabled();
+    await track.focus();
+    await track.press('ArrowRight');
+    await expect(counter).toHaveText('02 / 05');
+    await expect(page.locator('.project-card').first()).toHaveAttribute('inert', '');
+    await track.press('End');
+    await expect(counter).toHaveText('05 / 05');
+    await expect(page.getByRole('button', { name: 'Proyek berikutnya', exact: true })).toBeDisabled();
+    await track.press('Home');
+    await expect(counter).toHaveText('01 / 05');
+    await page.getByRole('button', { name: 'Tampilkan proyek Integrasi Timbangan', exact: true }).click();
+    await expect(counter).toHaveText('05 / 05');
+    await page.getByRole('button', { name: 'Tampilkan proyek Enterprise Resource Planning', exact: true }).click();
+    await expect(counter).toHaveText('01 / 05');
+    await track.scrollIntoViewIfNeeded();
+    const bounds = (await track.boundingBox())!;
+    if (viewport.label === 'mobile') {
+      const session = await context.newCDPSession(page);
+      const start = bounds.x + bounds.width - 30;
+      const finish = bounds.x + 30;
+      const y = bounds.y + 90;
+      await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: start, y }] });
+      for (let step = 1; step <= 10; step++) {
+        await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: start + (finish - start) * step / 10, y }] });
+        await page.waitForTimeout(20);
+      }
+      await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await session.detach();
+    } else {
+      // Start on the details button: a drag must never activate its click handler.
+      const button = (await page.locator('.project-details').first().boundingBox())!;
+      await page.mouse.move(button.x + button.width / 2, button.y + button.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(bounds.x + 35, button.y + button.height / 2, { steps: 16 });
+      await page.mouse.up();
+    }
+    await expect(counter).toHaveText('02 / 05');
+    await expect(dialog).not.toBeVisible();
+    // Native touch momentum and scroll snap can continue after the index changes.
+    await expect.poll(() => track.evaluate(el => {
+      const slide = el.querySelectorAll('.project-card')[1].getBoundingClientRect();
+      const bounds = el.getBoundingClientRect();
+      return Math.abs(slide.left + slide.width / 2 - bounds.left - el.clientWidth / 2);
+    })).toBeLessThan(2);
+    const left = await track.evaluate(el => el.scrollLeft);
+    const details = page.getByRole('button', { name: 'Lihat detail Manufacturing Planning System', exact: true });
+    await details.click();
+    await expect(page.locator('#dialog-description')).toContainText('250 mesin');
+    await page.keyboard.press('ArrowRight');
+    await expect(counter).toHaveText('02 / 05');
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+    await expect(details).toBeFocused();
+    expect(await track.evaluate(el => el.scrollLeft)).toBeCloseTo(left, 0);
+    await page.getByRole('button', { name: 'Proyek berikutnya', exact: true }).click();
+    await expect(counter).toHaveText('03 / 05');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.emulateMedia({ media: 'print' });
+    await expect(track).toHaveCSS('display', 'block');
+    await expect(page.locator('.carousel-controls')).toHaveCSS('display', 'none');
+    await expect(page.locator('.project-card')).toHaveCount(5);
+    await page.emulateMedia({ media: 'screen', reducedMotion: 'no-preference' });
+    await page.getByRole('button', { name: 'Tampilkan proyek Enterprise Resource Planning', exact: true }).click();
+    for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Proyek berikutnya', exact: true }).click();
+    await expect(counter).toHaveText('04 / 05');
+    await expect.poll(() => track.evaluate(el => {
+      const slide = el.querySelectorAll('.project-card')[3].getBoundingClientRect();
+      const bounds = el.getBoundingClientRect();
+      return Math.abs(slide.left + slide.width / 2 - bounds.left - el.clientWidth / 2);
+    })).toBeLessThan(2);
+    await expect(counter).toHaveText('04 / 05');
+  });
+
   test(`project dialog motion and dismissal on ${viewport.label}`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.goto('/#proyek');
-    const card = page.locator('.project-card').first();
+    const card = page.locator('.project-details').first();
     const dialog = page.locator('#project-dialog');
-    await card.locator('.project-art').click();
+    await card.click();
     // Pause midway to prove a visible transition, rather than just a CSS declaration.
     const midwayOpacity = await dialog.evaluate(element => {
       const animation = element.getAnimations().find(a => a instanceof CSSAnimation && a.animationName === 'project-dialog-in')!;
@@ -267,9 +348,9 @@ for (const viewport of [{ width: 1440, height: 900, label: 'desktop' }, { width:
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await page.goto('/');
-    await expect(page).toHaveTitle('Rizky Hermawan — Software Engineer');
+    await expect(page).toHaveTitle('Rizky Hermawan — Fullstack & Backend Engineer');
     await expect(page.locator('.personal-brand')).toContainText('Rizky Hermawan');
-    await expect(page.locator('#profile-title')).toHaveText('Rizky HermawanSoftware Engineer');
+    await expect(page.locator('#profile-title')).toHaveText('Rizky HermawanFullstack & Backend Engineer');
     await expect(page.locator('#experience-title')).toHaveText('Pengalaman Profesional');
     await expect(page.locator('#projects-title')).toHaveText('Proyek yang Pernah Dikerjakan');
     await expect(page.locator('#about-title')).toHaveText('Tentang Saya & Keahlian');
@@ -280,16 +361,28 @@ for (const viewport of [{ width: 1440, height: 900, label: 'desktop' }, { width:
     await expect(page).toHaveURL(/#pengalaman$/);
     await expect(page.locator('#experience-title')).toBeInViewport();
     expect(await page.locator('#portfolio section[id]').evaluateAll(sections => sections.map(section => section.id))).toEqual(['pengalaman', 'proyek', 'tentang', 'kontak']);
-    await expect(page.locator('#pengalaman')).toContainText('PT. KAHAPTEX');
+    await expect(page.locator('#pengalaman')).toContainText('PT Kahaptex Indonesia');
     await expect(page.locator('#pengalaman')).toContainText('2022 sampai sekarang');
+    await expect(page.locator('.hero-intro > p')).toHaveCount(2);
     await expect(page.locator('.hero-description').first()).toContainText('Saya Rizky Hermawan');
-    await expect(page.locator('.hero-description').first()).toContainText('Di PT. KAHAPTEX, saya mengembangkan');
-    for (const detail of ['Purchasing, Sales, Inventory, Production, dan HRIS', 'jadwal mesin', 'rekap data payroll', 'stored procedure', 'load balancing dan failover']) {
+    await expect(page.locator('.hero-description').first()).toContainText('saya bekerja bersama tim mengembangkan ERP');
+    for (const detail of ['PT Mitrahasanah Sukadamai', '2018 sampai 2022', 'Menggali kebutuhan aplikasi', 'frontend, backend, database', 'Ruby dan Cucumber', 'deployment melalui Git hooks', 'membimbing programmer', 'sesekali melakukan wawancara']) {
       await expect(page.locator('#pengalaman')).toContainText(detail);
     }
+    const currentJob = page.locator('.experience-entry').first();
+    await expect(currentJob.locator('li')).toHaveCount(6);
+    for (const projectDetail of ['302 pengguna', '2.500 karyawan', '250 mesin', '10 sampai 15 detik', '83%', '50 komputer']) {
+      await expect(currentJob).not.toContainText(projectDetail);
+    }
+    await expect(page.locator('.project-card')).toHaveCount(5);
     await expect(page.locator('.skill-groups')).toContainText('Grafana');
     await expect(page.locator('#kontak')).toContainText('Untuk membahas pengalaman kerja dan posisi yang relevan');
-    await expect(page.locator('.education-block')).toContainText('Universitas Sangga Buana');
+    await expect(page.locator('.education-block').first()).toContainText('Sarjana Komputer, Teknik Informatika');
+    await expect(page.locator('.education-block').first()).toContainText('Lulus 2019');
+    await expect(page.locator('.training-list')).toContainText('MTCNA');
+    await expect(page.locator('.personal-project-link')).toHaveAttribute('href', 'https://github.com/rhermawan56/amertanala-landingpage');
+    await expect(page.locator('.profile-facts')).toContainText('Pengembangan aplikasi sejak 2018');
+    await expect(page.locator('.experience-entry')).toHaveCount(2);
     await expect(page.locator('.skill-groups')).toContainText('MariaDB MaxScale');
     const backend = page.locator('.skill-group').filter({ has: page.getByRole('heading', { name: 'Backend', exact: true }) });
     for (const skill of ['Ruby', 'Ruby on Rails']) await expect(backend.getByText(skill, { exact: true })).toBeVisible();
@@ -302,10 +395,22 @@ for (const viewport of [{ width: 1440, height: 900, label: 'desktop' }, { width:
     await expect(page.locator('#portfolio')).not.toContainText('Template portofolio');
     await expect(page.locator('#portfolio')).not.toContainText('Punya ide menarik?');
     await expect(page.locator('#portfolio')).not.toContainText('Dari ide menjadi nyata');
-    for (const title of ['Enterprise Resource Planning', 'Manufacturing Planning System', 'Human Resource & Attendance']) {
+    for (const title of ['Enterprise Resource Planning', 'Manufacturing Planning System', 'Human Resource & Attendance', 'Validasi Pengiriman QR', 'Integrasi Timbangan']) {
+      await page.getByRole('button', { name: `Tampilkan proyek ${title}`, exact: true }).click();
       await page.getByRole('button', { name: `Lihat detail ${title}`, exact: true }).click();
       await expect(page.locator('#dialog-title')).toHaveText(title);
-      await expect(page.locator('#dialog-description')).toContainText('Saya mengembangkan');
+      const projectEvidence: Record<string, string[]> = {
+        'Enterprise Resource Planning': ['302 pengguna aktif harian', '10 sampai 15 detik', 'satu master dan lima replica', 'Rekan programmer mengembangkan modul finance'],
+        'Manufacturing Planning System': ['250 mesin', 'Berdasarkan pengamatan operasional'],
+        'Human Resource & Attendance': ['2.500 karyawan', 'sekitar 83%'],
+        'Validasi Pengiriman QR': ['100 sampai 200 surat jalan', 'Maret 2023', 'yang diketahui'],
+        'Integrasi Timbangan': ['VB ke Python pada 2025', 'lebih dari 50 komputer'],
+      };
+      for (const detail of projectEvidence[title]) await expect(page.locator('#dialog-description')).toContainText(detail);
+      if (title === 'Manufacturing Planning System') {
+        await expect(page.locator('#dialog-description')).toContainText('Laravel dan MySQL');
+        await expect(page.locator('#dialog-description')).not.toContainText('CodeIgniter');
+      }
       await expect(page.locator('#dialog-description')).not.toContainText('Sebagai Software Engineer');
       await expect(page.locator('#dialog-description')).not.toContainText('Ilustrasi');
       await expect(page.locator('#dialog-description')).not.toContainText('Ruby');

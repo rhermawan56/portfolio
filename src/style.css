@@ -21,12 +21,150 @@
 @media print{.profile-facts,.contact-location,.contact-email{color:#444}.experience-section{display:block;padding:30px 0;border-color:#ccc;break-inside:avoid}.experience-section h2{font-size:27px;margin-bottom:22px}.experience-entry{border-color:#999}.experience-entry h3,.experience-role,.experience-entry li,.experience-period{color:#333}.skill-group>h3,.education-block>p:last-child,.project-stack,.project-illustration-note{color:#444}.contact-links{display:block}.contact-links .text-link{display:inline-flex;margin:0 20px 0 0}.contact-links .button{display:none}.project-card{margin-bottom:25px}.portfolio-hero h1{font-size:40px}.education-block{margin-top:25px}}
 
 /* Project interactions preserve the existing card and dialog composition. */
+/* Concept previews share the existing card finish; they contain no operational data. */
+.art-shipping,.art-weighing{background:radial-gradient(ellipse at 50% 40%,#e7e0f0,#f0edf5)}
+.device-preview{position:absolute;width:240px;height:172px;left:calc(50% - 120px);top:28px;transform:perspective(650px) rotateY(-10deg) rotateX(7deg);color:#675179}
+.device-preview>span{font:7px monospace;letter-spacing:1px;position:absolute;top:0;left:3px}
+.shipping-phone{position:absolute;left:12px;top:24px;width:73px;height:125px;padding:20px 10px;background:#fff;border:4px solid #83718f;border-radius:10px;box-shadow:4px 5px 0 #c9bfd6}
+.shipping-phone>b{display:block;text-align:center;font:7px monospace;margin-top:10px}
+.concept-code{height:40px;display:grid;grid-template-columns:1fr 1fr;gap:4px;border:2px solid #bbaecc;padding:3px}
+.concept-code i{border:3px solid #83718f}
+.shipping-document{position:absolute;right:10px;top:36px;width:105px;height:104px;padding:15px 10px;background:#fff;border:1px solid #b5a9c5;border-radius:4px;box-shadow:4px 5px 0 #d4cbe0}
+.shipping-document>b{font:7px monospace}.shipping-document>i{display:block;border-top:2px solid #d3c7e1;margin-top:12px}
+.shipping-document>span{position:absolute;right:8px;bottom:6px;font-size:18px}
+.scale-platform{position:absolute;left:8px;top:73px;width:113px;height:57px;border:2px solid #a597b1;background:#ded7e7;box-shadow:0 9px 0 #b7a9c4,5px 15px 12px #49375c1a;transform:skewY(-7deg)}
+.scale-platform>div{position:absolute;inset:8px;border:1px solid #b7a9c4;background:#f3eff7}
+.scale-display{position:absolute;right:0;top:37px;width:105px;height:85px;background:#fff;border:3px solid #a597b1;border-radius:6px;padding:12px 7px;box-shadow:3px 5px 0 #d4cbe0}
+.scale-display>b{font:6px monospace;display:block}.scale-display>span{font:9px monospace;display:block;background:#e9e3f0;padding:7px 3px;margin-top:6px}
+.scale-display>i{display:inline-block;width:4px;height:4px;border-radius:50%;background:#aa95c8;margin:6px 5px 0 0}
+.scale-cable{position:absolute;left:120px;top:122px;width:65px;height:29px;border-right:2px solid #a597b1;border-bottom:2px solid #a597b1;border-left:2px solid #a597b1;border-radius:0 0 10px 10px}
+@media(max-width:1000px){.device-preview{transform:scale(.85) perspective(650px) rotateY(-10deg) rotateX(7deg)}}
+@media(max-width:700px){.device-preview{top:47px;transform:scale(1.08) perspective(650px) rotateY(-10deg) rotateX(7deg)}}
+.experience-list{min-width:0;display:grid;gap:40px}
+.training-list{padding-left:17px;margin:0;font-size:12px;line-height:1.9}
+.training-list li{margin-bottom:8px}
+.personal-project-link{display:inline-flex;align-items:center;gap:8px;font-size:12px;line-height:1.6;min-height:44px;margin-top:10px}
+.personal-project-link svg{width:13px;height:13px}
+.education-block>p:not(.eyebrow){font-size:11px;line-height:1.9;margin-top:9px}
+@media screen{
+  /* Light portfolio surfaces leave the physical room and print palette intact. */
+  .portfolio{--muted:#666170;--line:#d8d5e1;--accent:#7564b4;--portfolio-panel:#fff;--portfolio-text:#575461;background:#f4f3f7;color:#24232b;color-scheme:light}
+  .portfolio-nav,.hero-bottom{border-color:var(--line)}
+  .portfolio-hero h1{color:#24232b}
+  .portfolio .hero-description,.about-copy>p,.experience-entry li,dialog>p:not(.eyebrow){color:var(--portfolio-text)}
+  .portfolio .eyebrow,.profile-facts,.project-meta,.project-stack,.project-illustration-note,.section-note,.education-block>p:not(.eyebrow),.contact-location,.contact-email,.hero-bottom>span,.portfolio-footer>span,.portfolio-footer>a>span{color:var(--muted)}
+  .profile-facts>span:first-child,.experience-period,.skill-group>h3,.portfolio-hero>.eyebrow,.personal-project-link{color:#67519a}
+  .nav-links,.experience-role,.portfolio-footer,.portfolio-footer>button,.hero-bottom>a{color:var(--portfolio-text)}
+  .nav-links a:hover,.portfolio-footer>button:hover{color:#67519a}
+  .monogram{border-color:#a39bad;color:#67519a}
+  .brand-dot,.hero-bottom>a>span{color:#7564b4}
+  .portfolio a:focus-visible,.portfolio button:focus-visible{outline-color:#7564b4}
+  .portfolio ::selection{background:#d8ccef;color:#24232b}
+  .hero-orbit:before{background:#b9a6da22}
+  .hero-orbit>div{border-color:#8c70ba26;box-shadow:none}
+  .portfolio .button.secondary{background:var(--portfolio-panel);border-color:#b9b3c6;color:#34303e}
+  .portfolio .button.secondary:hover{background:#ebe7f2}
+  .portfolio .button.primary{background:#7564b4;color:#fff}
+  .portfolio .button.primary:hover{background:#7b69b6}
+  .project-art{background:var(--portfolio-panel);border-color:var(--line)}
+  .art-erp,.art-planning,.art-attendance,.art-shipping,.art-weighing{background:radial-gradient(ellipse at 50% 40%,#e7e0f0,#f0edf5)}
+  .mini-dashboard,.planning-preview,.attendance-preview{background:#fff;border-color:#b5a9c5;box-shadow:10px 20px 35px #49375c1a}
+  .dashboard-side{background:#e9e3f0;border-color:#d0c6dd}
+  .dashboard-side i{background:#9f8cb8}
+  .dashboard-chart{border-color:#d0c6dd}
+  .dashboard-rows i{background:#ece6f3;border-color:#d3c7e1}
+  .dashboard-main>b,.planning-preview>span,.attendance-preview>span,.attendance-profile b{color:#5c496f}
+  .planning-row b,.attendance-profile small{color:#766383}
+  .planning-scale i{background:#a092af}
+  .attendance-profile>i{background:#e5dcef;color:#675179}
+  .attendance-profile em{color:#675179}
+  .attendance-calendar>i{background:#ece6f2}
+  .attendance-calendar>.day-active{background:#ab94c3}
+  .attendance-line i{background:#c5b5d6}
+  .art-index{color:#766383}
+  .project-title>span{border-color:#b9b3c6;color:#67519a}
+  .project-card:hover .project-art{border-color:#7564b4}
+  .portfolio .skill-list>span{background:var(--portfolio-panel);border-color:var(--line);color:#575061}
+  .experience-section{display:block}
+  .experience-list{margin-top:38px;gap:0}
+  .experience-entry{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr);gap:40px;border-left:0;border-top:1px solid var(--line);padding:32px 0}
+  .experience-entry:before{display:none}
+  .experience-meta{min-width:0}
+  .experience-entry h3{font-size:22px;line-height:1.3}
+  .experience-entry ul{margin:0;max-width:85ch}
+  .experience-entry li::marker{color:#88709f}
+  .training-list{color:var(--portfolio-text)}
+  #project-dialog{background:#fff;border-color:#b9b3c6;color:#24232b;box-shadow:0 30px 140px #28203240}
+  #project-dialog::backdrop{background:#28203266}
+  .dialog-close,#dialog-link{color:#67519a}
+}
+@media screen and (max-width:700px){
+  .experience-list{margin-top:28px}
+  .experience-entry{grid-template-columns:1fr;gap:22px;padding:28px 0}
+  .experience-entry ul{padding-left:17px}
+}
+@media print{.experience-list{display:block}.experience-entry{break-inside:avoid;margin-bottom:25px}.training-list,.personal-project-link{color:#333}.personal-project-link svg{display:none}}
 .project-card:focus-visible .project-art{border-color:#b6a4ec}
 #project-dialog{max-height:calc(100svh - 40px);overflow-y:auto}
 #project-dialog[open]{animation:project-dialog-in 280ms cubic-bezier(.2,.7,.2,1) both}
 #project-dialog[open]::backdrop{animation:project-backdrop-in 280ms ease-out both}
 #project-dialog.is-closing{animation:project-dialog-out 180ms ease-in both}
 #project-dialog.is-closing::backdrop{animation:project-backdrop-out 180ms ease-in both}
+.hero-intro>p+p{margin-top:16px}
+#dialog-description{font-size:14px;line-height:1.8;color:#575461}
+#dialog-description>p+p{margin-top:17px}
+#project-dialog{max-width:680px;max-height:calc(100svh - 40px)}
+.carousel-controls{display:none}
+@media screen{
+  .portfolio-hero{min-height:0}
+  .hero-intro{max-width:720px}
+  .hero-bottom{margin-top:45px}
+  .project-carousel{min-width:0}
+  .project-carousel .carousel-track{position:relative;display:flex;gap:20px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:24px;scrollbar-width:none;padding:6px 24px 15px;cursor:grab;overscroll-behavior-x:contain}
+  .carousel-track::-webkit-scrollbar{display:none}
+  .project-carousel .project-card{flex:0 0 calc(100% - 40px);display:grid;grid-template-columns:1fr 1fr;align-items:center;scroll-snap-align:center;scroll-snap-stop:always;border:1px solid var(--line);border-radius:9px;background:#fff;overflow:hidden;min-width:0}
+  .project-carousel .project-art{height:320px;border:0;border-radius:0;border-right:1px solid var(--line);transform:none}
+  .project-copy{padding:28px 32px;min-width:0}
+  .project-copy .project-meta{margin:0 0 18px;gap:12px;font-size:9px;line-height:1.7}
+  .project-copy h3{font-size:28px;line-height:1.15;letter-spacing:-.8px}
+  .project-summary{font-size:14px;line-height:1.8;color:var(--portfolio-text);margin-top:18px;max-width:42ch}
+  .project-copy .project-stack{margin-top:14px}
+  .project-details{margin-top:22px}
+  .project-carousel .mini-dashboard,.project-carousel .planning-preview,.project-carousel .attendance-preview,.project-carousel .device-preview{top:50%;transform:translateY(-50%) scale(1.3) perspective(650px) rotateY(-10deg) rotateX(7deg)}
+  .carousel-track:focus-visible{outline:2px solid #7564b4;outline-offset:-2px;border-radius:9px}
+  .carousel-track.is-dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
+  .carousel-track.is-dragging button{pointer-events:none}
+  .carousel-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px;padding:0 24px}
+  .carousel-arrows,.carousel-dots{display:flex;align-items:center;gap:8px}
+  .carousel-arrows>button{border:1px solid var(--line);border-radius:7px;width:44px;height:44px;background:#fff;color:#67519a}
+  .carousel-arrows>button:disabled{opacity:.35;cursor:default}
+  .carousel-dots{gap:0}
+  .carousel-dots>button{width:44px;height:44px;display:grid;place-items:center}
+  .carousel-dots>button>span{width:6px;height:6px;border-radius:50%;background:#b9b3c6;transition:width .25s,background .25s}
+  .carousel-dots>button[aria-current]>span{width:20px;border-radius:4px;background:#7564b4}
+  .carousel-counter{font:11px monospace;color:#666170;white-space:nowrap}
+}
+@media screen and (max-width:1000px){
+  .project-copy{padding:24px}
+  .project-copy h3{font-size:24px}
+  .project-carousel .mini-dashboard,.project-carousel .planning-preview,.project-carousel .attendance-preview,.project-carousel .device-preview{transform:translateY(-50%) scale(.95) perspective(650px) rotateY(-10deg) rotateX(7deg)}
+}
+@media screen and (max-width:700px){
+  .project-carousel .carousel-track{padding:6px 4px 12px;scroll-padding:4px;gap:12px}
+  .project-carousel .project-card{flex-basis:calc(100% - 20px);grid-template-columns:1fr}
+  .project-carousel .project-art{height:215px;border-right:0;border-bottom:1px solid var(--line)}
+  .project-carousel .mini-dashboard,.project-carousel .planning-preview,.project-carousel .attendance-preview,.project-carousel .device-preview{transform:translateY(-50%) scale(.95) perspective(650px) rotateY(-10deg) rotateX(7deg)}
+  .project-copy{padding:22px}
+  .project-copy h3{font-size:24px}
+  .project-summary{font-size:12px;margin-top:14px}
+  .project-copy .project-meta{font-size:8px;margin-bottom:14px}
+  .carousel-controls{display:grid;grid-template-columns:1fr auto;padding:0;gap:0}
+  .carousel-arrows{grid-column:1;grid-row:1}
+  .carousel-dots{grid-column:1/-1;grid-row:2;justify-content:center}
+  .carousel-counter{grid-column:2;grid-row:1;font-size:10px}
+  .hero-bottom{margin-top:35px}
+}
+@media print{.carousel-controls,.project-details{display:none!important}.project-copy h3{font-size:20px}.project-summary{font-size:12px;line-height:1.6}.project-card[inert]{display:block}}
 @keyframes project-dialog-in{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes project-dialog-out{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(8px) scale(.98)}}
 @keyframes project-backdrop-in{from{opacity:0}to{opacity:1}}

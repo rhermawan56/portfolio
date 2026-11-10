@@ -40,23 +40,23 @@ export function surface(kind: 'wood' | 'plaster' | 'fabric', color: string) {
 export function screenTexture() {
   const canvas = document.createElement('canvas'); canvas.width = 1536; canvas.height = 960;
   const c = canvas.getContext('2d')!;
-  c.fillStyle = '#0b0b0e'; c.fillRect(0, 0, 1536, 960);
+  c.fillStyle = '#f4f3f7'; c.fillRect(0, 0, 1536, 960);
   const glow = c.createRadialGradient(1270, 420, 30, 1270, 420, 650);
-  glow.addColorStop(0, '#363044'); glow.addColorStop(.55, '#17151f'); glow.addColorStop(1, '#0b0b0e');
+  glow.addColorStop(0, '#e7e0f0'); glow.addColorStop(.55, '#f0edf5'); glow.addColorStop(1, '#f4f3f7');
   c.fillStyle = glow; c.fillRect(0, 0, 1536, 960);
-  c.fillStyle = '#eeeef1'; c.font = '600 27px sans-serif'; c.fillText(`${profile.initials} / ${profile.name}`, 90, 80, 800);
-  c.fillStyle = '#a3a2ac'; c.font = '22px sans-serif'; c.fillText('Tentang      Proyek      Kontak ↗', 1070, 80);
-  c.fillStyle = '#a99edb'; c.font = '22px sans-serif'; c.fillText(`●   ${profile.role.toUpperCase()}`, 90, 230, 1300);
-  c.fillStyle = '#f4f3f7'; c.font = '600 100px sans-serif';
+  c.fillStyle = '#24232b'; c.font = '600 27px sans-serif'; c.fillText(`${profile.initials} / ${profile.name}`, 90, 80, 800);
+  c.fillStyle = '#575461'; c.font = '22px sans-serif'; c.fillText('Tentang      Proyek      Kontak ↗', 1070, 80);
+  c.fillStyle = '#67519a'; c.font = '22px sans-serif'; c.fillText(`●   ${profile.role.toUpperCase()}`, 90, 230, 1300);
+  c.fillStyle = '#24232b'; c.font = '600 100px sans-serif';
   const headline = profile.headline.split('\n').slice(0, 2);
   const headingSize = Math.min(100, Math.floor(1300 / Math.max(...headline.map(line => c.measureText(line).width)) * 100));
   c.font = `600 ${headingSize}px sans-serif`;
   headline.forEach((line, i) => c.fillText(line, 85, 370 + i * 110));
-  c.fillStyle = '#a3a2ac';
+  c.fillStyle = '#575461';
   let lines: string[] = [], introSize = 24;
   do {
     c.font = `${introSize}px sans-serif`; lines = []; let line = '';
-    for (const word of profile.intro.split(' ')) {
+    for (const word of profile.screenIntro.split(' ')) {
       const next = line ? `${line} ${word}` : word;
       if (c.measureText(next).width > 1300 && line) { lines.push(line); line = word; } else line = next;
     }
@@ -65,13 +65,13 @@ export function screenTexture() {
     introSize--;
   } while (introSize >= 16);
   lines.forEach((text, i) => c.fillText(text, 90, 540 + i * 30));
-  c.fillStyle = '#7267b8'; c.beginPath(); c.roundRect(90, 610, 230, 65, 10); c.fill();
+  c.fillStyle = '#7564b4'; c.beginPath(); c.roundRect(90, 610, 230, 65, 10); c.fill();
   c.fillStyle = '#fff'; c.font = '22px sans-serif'; c.fillText('Lihat Pengalaman ↗', 105, 652);
-  c.strokeStyle = '#44414d'; c.beginPath(); c.roundRect(340, 610, 180, 65, 10); c.stroke();
-  c.fillStyle = '#eee'; c.fillText('Unduh CV  ↓', 365, 652);
-  c.strokeStyle = '#28262f'; c.beginPath(); c.moveTo(90, 768); c.lineTo(1446, 768); c.stroke();
-  c.fillStyle = '#92909d'; c.font = '20px monospace'; c.fillText('01 / PENGALAMAN PROFESIONAL', 90, 826);
-  c.fillStyle = '#eee'; c.font = '600 42px sans-serif'; c.fillText('Pengalaman Profesional', 90, 900);
+  c.strokeStyle = '#b9b3c6'; c.beginPath(); c.roundRect(340, 610, 180, 65, 10); c.stroke();
+  c.fillStyle = '#24232b'; c.fillText('Unduh CV  ↓', 365, 652);
+  c.strokeStyle = '#d8d5e1'; c.beginPath(); c.moveTo(90, 768); c.lineTo(1446, 768); c.stroke();
+  c.fillStyle = '#666170'; c.font = '20px monospace'; c.fillText('01 / PENGALAMAN PROFESIONAL', 90, 826);
+  c.fillStyle = '#24232b'; c.font = '600 42px sans-serif'; c.fillText('Pengalaman Profesional', 90, 900);
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 4;
   return texture;
 }
